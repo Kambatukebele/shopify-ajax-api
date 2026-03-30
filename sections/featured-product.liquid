@@ -1,212 +1,179 @@
+<section id="feature-product--{{ section.id }}" class="w-full featured-product">
+  <div class="container mx-auto">
+    <div class="w-full pb-4">
+      <h2 class="text-3xl font-semibold">
+        {{- section.settings.title -}}
+      </h2>
+    </div>
+    <div class="w-full grid grid-cols-2 gap-3 lg:grid-cols-4">
+      {%- for product in section.settings.product_list -%}
+        {%- assign current_variant = product.selected_or_first_available_variant -%}
+        <div class="w-full flex flex-col gap-2">
+          <!-- Product image -->
+          <div class="w-full">
+            {{
+              product.featured_image
+              | image_url: width: 600, height: 600
+              | image_tag: class: 'w-full h-full block object-center object-cover product-image'
+            }}
+          </div>
 
+          {% form 'product', product, class: 'product-form' %}
+            <div class="flex flex-col gap-2">
+              <input type="hidden" name="quantity" value="1">
 
-<script type="application/ld+json">
-  {{ section.settings.product | structured_data }}
-</script>
+              <!-- Variant ID -->
+              <input
+                type="hidden"
+                name="id"
+                value="{{ current_variant.id }}"
+                class="variant-id-input"
+              >
 
-{%- liquid
-  assign product = section.settings.product
-  assign gallery_aspect_ratio = product.featured_media.preview_image.aspect_ratio | default: 1
--%}
-{% render 'quick-add-styles' %}
-{% render 'quick-add-modal-styles' %}
-{% render 'buy-buttons-styles' %}
-{% render 'product-badges-styles' %}
+              {%- assign selected_color = '' -%}
+              {%- assign selected_color_index = null -%}
 
-<div class="section-background color-{{ section.settings.color_scheme }}"></div>
-<div
-  class="
-    featured-product-section
-    section
-    section--full-width
-    color-{{ section.settings.color_scheme }}
-  "
-  style="--gallery-aspect-ratio: {{ gallery_aspect_ratio }};"
-  data-testid="featured-product-{{ section.id }}"
->
-  <h2 class="visually-hidden">{{ 'accessibility.featured_product' | t }}</h2>
-  <div
-    class="section-content-wrapper spacing-style size-style border-style"
-    style="
-      {% render 'spacing-style', settings: section.settings %}
-      --media-height: 100%;
-      {% if request.visual_preview_mode %}
-        --visual-preview--height: 100%;
-      {% endif %}
-    "
-  >
-    {% capture featured_product_media %}
-      {% content_for 'block', type: '_media-without-appearance', id: 'media', closest.product: section.settings.product %}
-    {% endcapture %}
+              <!-- COLOR SWATCHES -->
+              <div class="w-full flex gap-1.5">
+                {%- for color in product.options_with_values -%}
+                  {% comment %} {{ color.selected_value }} {% endcomment %}
+                  <hr>
 
-    {% capture featured_product_content %}
-      {% content_for 'block', type: '_featured-product', id: 'featured-product', closest.product: section.settings.product %}
-    {% endcapture %}
+                  <br>
 
-    {% if section.settings.layout == 'media-left' %}
-      {{ featured_product_media }}
-      {{ featured_product_content }}
-    {% else %}
-      {{ featured_product_content }}
-      {{ featured_product_media }}
-    {% endif %}
+                  {% comment %}
+                    <span
+                      data-color="{{ color | downcase }}"
+                      style="background-color: {{- color | downcase -}}"
+                      class="color-swatch w-4 h-4 md:w-5 md:h-5 block border border-gray-300 cursor-pointer rounded-full"
+                    ></span>
+                  {% endcomment %}
+                {%- endfor -%}
+              </div>
+
+              <!-- SIZE BUTTONS -->
+              <div class="w-full flex gap-1.5 flex-wrap size-buttons">
+                {%- for size in product.options_by_name.Size.values -%}
+                  <span
+                    class="size-btn border border-gray-300 px-2 py-0.5 text-xs cursor-pointer"
+                  >
+                    {{- size -}}
+                  </span>
+                {%- endfor -%}
+              </div>
+
+              <!-- TEXT -->
+              <div>
+                <h4 class="text-lg font-medium">{{ product.title }}</h4>
+                <span class="block text-sm font-light">
+                  {% for collection in product.collections %}
+                    {{ collection.title }}
+                  {% endfor %}
+                </span>
+                <span class="block text-xl product-price">
+                  {{ current_variant.price | money }}
+                </span>
+              </div>
+
+              <!-- ADD TO CART -->
+              <button
+                type="submit"
+                class="bg-blue-900 text-white block py-3 rounded cursor-pointer text-base uppercase add-to-cart-btn"
+              >
+                Add to cart
+              </button>
+            </div>
+          {% endform %}
+        </div>
+
+      {%- else -%}
+        {%- for item in (1..4) -%}
+          <div class="w-full flex flex-col gap-2 ">
+            <div class="max-w-75 snap-start shrink-0">
+              {{ 'product-1' | placeholder_svg_tag: 'w-full h-full object-center object-cover' }}
+            </div>
+            <form class="product-form">
+              <div class="flex flex-col gap-2">
+                <input type="hidden" name="quantity" value="1">
+
+                <!-- Variant ID -->
+                <input
+                  type="hidden"
+                  name="id"
+                  value="{{ current_variant.id }}"
+                  class="variant-id-input"
+                >
+
+                <!-- COLOR SWATCHES -->
+                <div class="w-full flex gap-1.5">
+                  <span
+                    style="background-color: green"
+                    class="color-swatch w-4 h-4 md:w-5 md:h-5 block border border-gray-300 cursor-pointer rounded-full"
+                  ></span>
+                </div>
+
+                <!-- SIZE BUTTONS -->
+                <div class="w-full flex gap-1.5 flex-wrap size-buttons">
+                  <span
+                    class="size-btn border border-gray-300 px-2 py-0.5 text-xs cursor-pointer"
+                  >
+                    32
+                  </span>
+                </div>
+
+                <!-- TEXT -->
+                <div>
+                  <h4 class="text-lg font-medium">Running shoes</h4>
+                  <span class="block text-sm font-light"> Collection </span>
+                  <span class="block text-xl product-price"> $99 </span>
+                </div>
+
+                <!-- ADD TO CART -->
+                <button
+                  type="submit"
+                  class="bg-blue-900 text-white block py-3 rounded cursor-pointer text-base uppercase add-to-cart-btn"
+                >
+                  Add to cart
+                </button>
+              </div>
+            </form>
+          </div>
+        {%- endfor -%}
+      {%- endfor -%}
+    </div>
   </div>
-</div>
+</section>
 
-{% stylesheet %}
-  .featured-product-section .section-content-wrapper {
-    grid-template-columns: 1fr;
-    display: grid;
-    overflow: hidden;
-
-    @media screen and (min-width: 750px) {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-
-  .featured-product-section {
-    --viewport-offset: 400px;
-    --constrained-min-height: var(--visual-preview--height, 80dvh);
-    --constrained-height: max(var(--constrained-min-height), calc(100vh - var(--viewport-offset)));
-
-    @media screen and (min-width: 750px) {
-      --viewport-offset: 300px;
-    }
-  }
-
-  .featured-product-section .product-grid__card {
-    --padding-block: 20px;
-    --padding-inline: 20px;
-
-    @media screen and (min-width: 750px) {
-      --padding-block: 40px;
-      --padding-inline: 40px;
-    }
-  }
-
-  @media screen and (max-width: 749px) {
-    .featured-product-section .media-block {
-      order: -1;
-    }
-  }
-
-  @media screen and (min-width: 750px) {
-    .featured-product-section .product-card__content {
-      --hugged-width: calc(var(--constrained-height) * var(--gallery-aspect-ratio, var(--media-preview-ratio)));
-      width: min(100%, var(--hugged-width));
-      margin-left: auto;
-      margin-right: auto;
-    }
-  }
-{% endstylesheet %}
+<script></script>
 
 {% schema %}
 {
-  "name": "t:names.featured_product",
-  "disabled_on": {
-    "groups": ["header"]
-  },
+  "name": "Featured product",
   "settings": [
     {
-      "type": "product",
-      "id": "product",
-      "label": "t:settings.product"
+      "type": "header",
+      "content": "Text"
     },
     {
-      "type": "select",
-      "id": "layout",
-      "label": "t:settings.media_position",
-      "options": [
-        {
-          "value": "media-left",
-          "label": "t:options.left"
-        },
-        {
-          "value": "media-right",
-          "label": "t:options.right"
-        }
-      ],
-      "default": "media-left"
-    },
-    {
-      "type": "color_scheme",
-      "id": "color_scheme",
-      "label": "t:settings.color_scheme",
-      "default": "scheme-1"
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Featured product"
     },
     {
       "type": "header",
-      "content": "t:content.padding"
+      "content": "Products settings"
     },
     {
-      "type": "range",
-      "id": "padding-block-start",
-      "label": "t:settings.top",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "default": 0
-    },
-    {
-      "type": "range",
-      "id": "padding-block-end",
-      "label": "t:settings.bottom",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "default": 0
+      "type": "product_list",
+      "id": "product_list",
+      "label": "Product list",
+      "limit": 4
     }
   ],
   "presets": [
     {
-      "name": "t:names.featured_product",
-      "category": "t:categories.products",
-      "settings": {
-        "color_scheme": "scheme-3"
-      },
-      "blocks": {
-        "media": {
-          "type": "_media-without-appearance",
-          "static": true,
-          "name": "t:names.product_media"
-        },
-        "featured-product": {
-          "type": "_featured-product",
-          "static": true,
-          "name": "t:names.product",
-          "blocks": {
-            "featured-product-title": {
-              "type": "product-title",
-              "name": "t:names.title",
-              "static": true,
-              "settings": {
-                "type_preset": "h5",
-                "width": "100%"
-              }
-            },
-            "featured-product-price": {
-              "type": "_featured-product-price",
-              "name": "t:names.price",
-              "static": true
-            },
-            "featured-product-gallery": {
-              "type": "_featured-product-gallery",
-              "name": "t:names.image",
-              "static": true
-            },
-            "featured-product-swatches": {
-              "type": "swatches",
-              "name": "t:names.swatches",
-              "static": true,
-              "settings": {
-                "hide_padding": true
-              }
-            }
-          }
-        }
-      }
+      "name": "Featured product"
     }
   ]
 }
