@@ -7,8 +7,7 @@
     </div>
     <div class="w-full grid grid-cols-2 gap-3 lg:grid-cols-4">
       {%- for product in section.settings.product_list -%}
-        {%- assign current_variant = product.selected_or_first_available_variant -%}
-        <div class="w-full flex flex-col gap-2">
+        <div class="w-full flex flex-col gap-2" data-product-handle="{{ product.handle }}">
           <!-- Product image -->
           <div class="w-full">
             {{
@@ -19,47 +18,64 @@
           </div>
 
           {% form 'product', product, class: 'product-form' %}
+            {%- assign current_variant = product.selected_or_first_available_variant -%}
             <div class="flex flex-col gap-2">
               <input type="hidden" name="quantity" value="1">
+              <input type="hidden" name="id" value="{{ current_variant.id }}" class="variant-id-input">
 
-              <!-- Variant ID -->
-              <input
-                type="hidden"
-                name="id"
-                value="{{ current_variant.id }}"
-                class="variant-id-input"
-              >
-
+              {% # Display all color %}
+              {%- assign show_all_colors = '' -%}
+              {% # selected color %}
               {%- assign selected_color = '' -%}
-              {%- assign selected_color_index = null -%}
+              {% #  size value based on the selected color %}
+              {%- assign all_sizes_based_on_selected_color = '' -%}
+              {%- assign selected_size = '' -%}
 
-              <!-- COLOR SWATCHES -->
+              {%- for option in product.options_with_values -%}
+                {%- if option.name == 'Color' -%}
+                  {%- assign show_all_colors = option.values -%}
+
+                  {% comment %} {%- assign selected_color = option.selected_value -%} {% endcomment %}
+                  {%- assign selected_color = product.selected_or_first_available_variant.options[0] -%}
+                {%- endif -%}
+
+                {% comment %}
+                  {%- if option.name == 'Size' -%}
+                    {%- assign all_sizes_based_on_selected_color = option.values -%}
+                    {%- assign selected_size = option.selected_value -%}
+                  {%- endif -%}
+                {% endcomment %}
+              {%- endfor -%}
+              <!-- LOOP 1: Swatches only -->
+
               <div class="w-full flex gap-1.5">
-                {%- for color in product.options_with_values -%}
-                  {% comment %} {{ color.selected_value }} {% endcomment %}
-                  <hr>
-
-                  <br>
-
-                  {% comment %}
-                    <span
-                      data-color="{{ color | downcase }}"
-                      style="background-color: {{- color | downcase -}}"
-                      class="color-swatch w-4 h-4 md:w-5 md:h-5 block border border-gray-300 cursor-pointer rounded-full"
-                    ></span>
-                  {% endcomment %}
+                {%- for color in show_all_colors -%}
+                  <span
+                    data-product-id="{{ current_variant.id }}"
+                    data-color="{{ color | downcase }}"
+                    style="background-color: {{ color | downcase }}"
+                    class="
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    color-swatch w-4 h-4 md:w-5 md:h-5 block cursor-pointer rounded-full border border-gray-400 shadow
+                    "
+                  ></span>
                 {%- endfor -%}
               </div>
 
-              <!-- SIZE BUTTONS -->
-              <div class="w-full flex gap-1.5 flex-wrap size-buttons">
-                {%- for size in product.options_by_name.Size.values -%}
-                  <span
-                    class="size-btn border border-gray-300 px-2 py-0.5 text-xs cursor-pointer"
-                  >
-                    {{- size -}}
-                  </span>
-                {%- endfor -%}
+              <div
+                class="w-full flex gap-1.5 flex-wrap size-buttons"
+              >
+                {% for variant in product.variants %}
+                  {%- assign all_variant_colors = variant.options[0] -%}
+                  {%- if variant.options[0] == selected_color -%}
+                    <span
+                      data-size="{{ variant.options[1] }}"
+                      data-variant="{{ variant.id }}"
+                      class="size-btn border border-gray-300 px-2 py-0.5 text-xs cursor-pointer"
+                    >
+                      {{ variant.options[1] }}
+                    </span>
+                  {%- endif -%}
+                {% endfor %}
               </div>
 
               <!-- TEXT -->
@@ -88,47 +104,28 @@
 
       {%- else -%}
         {%- for item in (1..4) -%}
-          <div class="w-full flex flex-col gap-2 ">
+          <div class="w-full flex flex-col gap-2">
             <div class="max-w-75 snap-start shrink-0">
               {{ 'product-1' | placeholder_svg_tag: 'w-full h-full object-center object-cover' }}
             </div>
             <form class="product-form">
               <div class="flex flex-col gap-2">
                 <input type="hidden" name="quantity" value="1">
-
-                <!-- Variant ID -->
-                <input
-                  type="hidden"
-                  name="id"
-                  value="{{ current_variant.id }}"
-                  class="variant-id-input"
-                >
-
-                <!-- COLOR SWATCHES -->
+                <input type="hidden" name="id" value="{{ current_variant.id }}" class="variant-id-input">
                 <div class="w-full flex gap-1.5">
                   <span
                     style="background-color: green"
                     class="color-swatch w-4 h-4 md:w-5 md:h-5 block border border-gray-300 cursor-pointer rounded-full"
                   ></span>
                 </div>
-
-                <!-- SIZE BUTTONS -->
                 <div class="w-full flex gap-1.5 flex-wrap size-buttons">
-                  <span
-                    class="size-btn border border-gray-300 px-2 py-0.5 text-xs cursor-pointer"
-                  >
-                    32
-                  </span>
+                  <span class="size-btn border border-gray-300 px-2 py-0.5 text-xs cursor-pointer">32</span>
                 </div>
-
-                <!-- TEXT -->
                 <div>
                   <h4 class="text-lg font-medium">Running shoes</h4>
-                  <span class="block text-sm font-light"> Collection </span>
-                  <span class="block text-xl product-price"> $99 </span>
+                  <span class="block text-sm font-light">Collection</span>
+                  <span class="block text-xl product-price">$99</span>
                 </div>
-
-                <!-- ADD TO CART -->
                 <button
                   type="submit"
                   class="bg-blue-900 text-white block py-3 rounded cursor-pointer text-base uppercase add-to-cart-btn"
@@ -143,8 +140,7 @@
     </div>
   </div>
 </section>
-
-<script></script>
+<script src="{{ 'featured-product.js' | asset_url }}" defer></script>
 
 {% schema %}
 {
