@@ -1,0 +1,103 @@
+<section class="w-full">
+  <div class="container ">
+    <!-- Product card -->
+    {% liquid
+      assign products_selected = false
+      assign products = section.settings.product_list
+
+      if products != blank or products != empty
+        assign products_selected = true
+      endif
+    %}
+
+    <div class="flex flex-wrap justify-center items-center sm:justify-between">
+      {% if products_selected %}
+        {% for product in products %}
+          <form class="" method="POST" action="{{ routes.cart_add_url }}">
+            <div class="w-85">
+              <div class="w-full overflow-hidden">
+                {{
+                  product.featured_image
+                  | image_url: width: 300, height: 300
+                  | image_tag: class: 'w-full h-full object-cover object-center  block', loading: 'lazy'
+                }}
+              </div>
+              <div class="flex flex-col gap-4 py-4 px-2">
+                <h4 class="text-xl font-medium">{{ product.title }}</h4>
+                <input type="hidden" name="quantity" value="1">
+                {% if product.has_only_default_variant %}
+                  <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+                {% else %}
+                  <select name="id" class="border border-gray-300 px-1 py-2">
+                    {% for variant in product.variants %}
+                      <option
+                        value="{{ variant.id }}"
+                      >
+                        {{ variant.title }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                {% endif %}
+
+                <div class="flex justify-between items-center">
+                  <h5 class="font-bold text-lg">$1,699</h5>
+                  <button
+                    type="submit"
+                    class="submit-add-to-cart px-4 cursor-pointer bg-blue-800 text-white hover:bg-red-800 py-2 rounded"
+                  >
+                    Add to cart
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        {% endfor %}
+      {% else %}
+        {% for variable in (1..4) %}
+          <div class="w-85">
+            <div class="w-full overflow-hidden">
+              {{ 'product-1' | placeholder_svg_tag: 'w-full h-full object-cover object-center  block' }}
+            </div>
+            <div class="flex flex-col gap-4">
+              <h4 class="text-xl font-medium">Product title</h4>
+              <select class="border border-gray-300 px-1 py-2">
+                <option>S</option>
+                <option>S</option>
+                <option>S</option>
+                <option>S</option>
+                <option>S</option>
+              </select>
+              <div class="flex justify-between items-center">
+                <h5 class="font-bold text-lg">$1,699</h5>
+                <button class="submit-add-to-cart px-4 cursor-pointer bg-blue-800 text-white hover:bg-red-800 py-2 rounded">
+                  Add to cart
+                </button>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<script src="{{ 'ajax-practice.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Ajax Practice",
+  "settings": [
+    {
+      "type": "product_list",
+      "id": "product_list",
+      "label": "Select your product",
+      "limit": 8
+    }
+  ],
+  "presets": [
+    {
+      "name": "Ajax Practice"
+    }
+  ]
+}
+{% endschema %}
