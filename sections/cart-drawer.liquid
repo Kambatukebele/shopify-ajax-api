@@ -1,0 +1,128 @@
+<cart-drawer>
+  <div
+    id="cart-drawer"
+    data-section-id="{{ section.id }}"
+    class="fixed inset-0 z-50 bg-black/0 opacity-0 pointer-events-none transition-all duration-300"
+  >
+    <!-- Drawer -->
+    <aside
+      class="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl transition-transform duration-300 ease-out"
+    >
+      <!-- Header -->
+      <div class="flex items-center justify-between px-6 py-5 border-b border-neutral-200">
+        <div>
+          <h2 class="text-xl font-semibold">Your Cart</h2>
+          <p class="text-sm text-neutral-500">{{ cart.item_count }} Items</p>
+        </div>
+
+        <button
+          id="cart-close"
+          class="size-10 rounded-full hover:bg-neutral-100 flex items-center justify-center"
+        >
+          ✕
+        </button>
+      </div>
+
+      {% if cart.empty? %}
+        <div class="w-full relative h-screen">
+          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+            <h3 class="text-center mb-4">Your cart is empty</h3>
+            <a href="{{ routes.collections_url }}" class="block px-8 py-3 bg-black text-white rounded-xl"
+              >View All Collection</a
+            >
+          </div>
+        </div>
+      {% else %}
+        <!-- Products -->
+        <div class="flex-1 overflow-y-auto px-6 py-5">
+          {% for item in cart.items %}
+            <!-- Item -->
+            <div class="flex gap-4 py-4 border-b border-neutral-200">
+              <div class="size-24 rounded-xl overflow-hidden bg-neutral-100 shrink-0">
+                {{ item.image | image_url: width: 200, height: 200 | image_tag: class: 'w-full h-full object-cover' }}
+              </div>
+
+              <div class="flex-1">
+                <div class="flex justify-between gap-4">
+                  <div>
+                    <h3 class="font-medium">{{ item.title }}</h3>
+
+                    {% for option in item.options_with_values %}
+                      <p class="text-sm text-neutral-500 mt-1">{{ option.name }}: {{ option.value }}</p>
+                    {% endfor %}
+                  </div>
+
+                  <span class="font-semibold"> {{ item.original_price | money }} </span>
+                </div>
+
+                <div class="flex items-center justify-between mt-4">
+                  <div class="flex items-center border border-neutral-300 rounded-lg">
+                    <button data-minus class="px-3 py-2 cursor-pointer">−</button>
+                    <span class="px-4 py-2 border-x border-neutral-300"> {{ item.quantity }} </span>
+                    <button data-plus class="px-3 py-2 cursor-pointer">+</button>
+                  </div>
+
+                  <a href="{{ item.url_to_remove }}" class="text-sm text-neutral-500 hover:text-black">Remove</a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Footer -->
+        <div class="border-t border-neutral-200 p-6 flex flex-col gap-4">
+          <!-- Summary -->
+          <div class="space-y-3 mb-6">
+            <div class="flex justify-between">
+              <span class="text-neutral-500"> Subtotal </span>
+              <span>{{ cart.original_total_price | money }}</span>
+            </div>
+
+            <div class="flex justify-between text-lg font-semibold">
+              <span>Total</span>
+              <span>{{ cart.total_price | money }}</span>
+            </div>
+          </div>
+
+          <div class="w-full flex flex-col justify-center items-center gap-2">
+            <button
+              class="cursor-pointer w-full h-13 rounded-xl bg-black text-white font-medium"
+            >
+              Checkout
+            </button>
+
+            <a
+              href="{{ routes.cart_url }}"
+              class="cursor-pointer w-full flex justify-center items-center h-13 rounded-xl border border-neutral-300 mt-3"
+            >
+              View Cart
+            </a>
+          </div>
+        </div>
+      {% endif %}
+    </aside>
+  </div>
+</cart-drawer>
+
+<style>
+  #cart-drawer aside {
+    transform: translate3d(100%, 0, 0);
+  }
+
+  #cart-drawer.is-open aside {
+    transform: translate3d(0, 0, 0);
+  }
+
+  #cart-drawer {
+    opacity: 0;
+    pointer-events: none;
+    background: rgb(0 0 0 / 0%);
+    transition: opacity 0.3s ease, background-color 0.3s ease;
+  }
+
+  #cart-drawer.is-open {
+    opacity: 1;
+    pointer-events: auto;
+    background: rgb(0 0 0 / 40%);
+  }
+</style>

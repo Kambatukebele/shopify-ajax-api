@@ -1,4 +1,4 @@
-<header>
+<header data-header-id="{{ section.id }}">
   <h2 class="header__title">
     {{ shop.name | link_to: routes.root_url }}
   </h2>
@@ -16,15 +16,17 @@
       </shopify-account>
     {% endif %}
 
-    <a href="{{ routes.cart_url }}">
-      {% if cart.item_count > 0 %}
-        <sup>{{ cart.item_count }}</sup>
-      {% endif %}
+    <div class="relative cart-item-bubble cursor-pointer">
+      <sup class="absolute top-0 right-0 w-5 h-5 bg-black text-white rounded-full flex justify-center items-center">
+        {{- cart.item_count -}}
+      </sup>
 
       {{ 'icon-cart.svg' | inline_asset_content }}
-    </a>
+    </div>
   </div>
 </header>
+
+<script src="{{ 'header.js' | asset_url }}" defer></script>
 
 {% stylesheet %}
   header {

@@ -9,12 +9,20 @@
  */
 {
   "sections": {
-    "main": {
-      "type": "hello-world",
-      "settings": {}
+    "ajax_practice_gLgUPb": {
+      "type": "ajax-practice",
+      "name": "Ajax Practice",
+      "settings": {
+        "product_list": [
+          "nike-air-force-1-shadow",
+          "the-compare-at-price-snowboard",
+          "the-complete-snowboard",
+          "the-collection-snowboard-oxygen"
+        ]
+      }
     }
   },
   "order": [
-    "main"
+    "ajax_practice_gLgUPb"
   ]
 }

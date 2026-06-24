@@ -33,7 +33,9 @@
     {{ content_for_layout }}
 
     {% sections 'footer-group' %}
-    <script src="{{ 'drawer.js' | asset_url }}" defer></script>
-    {% render 'drawer' %}
+
+    <script src="{{ 'cart-drawer.js' | asset_url }}" defer></script>
+
+    {% section 'cart-drawer' %}
   </body>
 </html>
