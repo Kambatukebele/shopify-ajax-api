@@ -1,0 +1,29 @@
+<div class="border-t border-neutral-200 p-6 flex flex-col gap-4 cart-drawer-footer">
+  <!-- Summary -->
+  <div class="space-y-3 mb-6 cart-drawer-footer-total">
+    <div class="flex justify-between">
+      <span class="text-neutral-500"> Subtotal </span>
+      <span>{{ cart.original_total_price | money }}</span>
+    </div>
+
+    <div class="flex justify-between text-lg font-semibold">
+      <span>Total</span>
+      <span>{{ cart.total_price | money }}</span>
+    </div>
+  </div>
+
+  <div class="w-full flex flex-col justify-center items-center gap-2">
+    <button
+      class="cursor-pointer w-full h-13 rounded-xl bg-black text-white font-medium"
+    >
+      Checkout
+    </button>
+
+    <a
+      href="{{ routes.cart_url }}"
+      class="cursor-pointer w-full flex justify-center items-center h-13 rounded-xl border border-neutral-300 mt-3"
+    >
+      View Cart
+    </a>
+  </div>
+</div>

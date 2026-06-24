@@ -42,21 +42,8 @@ forms.forEach((form) => {
       let new_cart_drawer = data.sections["cart-drawer"];
 
       cart_drawer_html.innerHTML = new_cart_drawer;
-
-      console.log(cart_drawer_html.innerHTML);
-
       document.querySelector("[data-drawer-id]").outerHTML =
         cart_drawer_html.innerHTML;
-
-      // Get all the cart item
-
-      // const get_updated_cart = await fetch(`${URL}cart.js`);
-      // const update_data = await get_updated_cart.json();
-      // console.log(update_data);
-
-      //Dispatch update cart
-      // document.dispatchEvent(new CustomEvent("cart:update"));
-      //Dispatch Event open cart
       document.dispatchEvent(new CustomEvent("cart:open"));
     }
   });
