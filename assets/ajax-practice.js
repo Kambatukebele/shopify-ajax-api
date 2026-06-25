@@ -44,16 +44,15 @@ forms.forEach((form) => {
       form.querySelector(".submit-add-to-cart").classList.remove("text-black");
       form.querySelector(".submit-add-to-cart").textContent = "Add to cart";
 
-      // rendering heading to update the bubble count
-      const html_header = document.createElement("div");
-      let new_header = data.sections[get_header_section_id];
-      html_header.innerHTML = new_header;
-
-      // Updating the bubble
-      document.querySelector(".cart-item-bubble > sup").textContent =
-        html_header.querySelector(".cart-item-bubble > sup").textContent;
-
-      document.dispatchEvent(new CustomEvent("cart:updated"));
+      document.dispatchEvent(
+        new CustomEvent("cart:updated", {
+          bubbles: true,
+          detail: {
+            data_header: data.sections[get_header_section_id],
+            ["data-cart-drawer"]: data.sections["cart-drawer"],
+          },
+        }),
+      );
     }
   });
 });
