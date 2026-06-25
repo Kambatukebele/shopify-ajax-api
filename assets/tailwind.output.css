@@ -9,6 +9,7 @@
       "Courier New", monospace;
     --color-red-800: oklch(44.4% 0.177 26.899);
     --color-blue-800: oklch(42.4% 0.199 265.638);
+    --color-gray-100: oklch(96.7% 0.003 264.542);
     --color-gray-300: oklch(87.2% 0.01 258.338);
     --color-neutral-50: oklch(98.5% 0 0);
     --color-neutral-100: oklch(97% 0 0);
@@ -412,6 +413,9 @@
   .bg-blue-800 {
     background-color: var(--color-blue-800);
   }
+  .bg-gray-100 {
+    background-color: var(--color-gray-100);
+  }
   .bg-neutral-50 {
     background-color: var(--color-neutral-50);
   }
@@ -489,6 +493,9 @@
   .font-semibold {
     --tw-font-weight: var(--font-weight-semibold);
     font-weight: var(--font-weight-semibold);
+  }
+  .text-black {
+    color: var(--color-black);
   }
   .text-neutral-500 {
     color: var(--color-neutral-500);

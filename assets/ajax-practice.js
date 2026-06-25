@@ -4,6 +4,14 @@ forms.forEach((form) => {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    // Disable button
+    form.querySelector(".submit-add-to-cart").disabled = true;
+    form.querySelector(".submit-add-to-cart").classList.remove("bg-blue-800");
+    form.querySelector(".submit-add-to-cart").classList.remove("text-white");
+    form.querySelector(".submit-add-to-cart").classList.add("bg-gray-100");
+    form.querySelector(".submit-add-to-cart").classList.add("text-black");
+    form.querySelector(".submit-add-to-cart").textContent = "Adding ...";
+
     // add to cart
     let URL = window.Shopify.routes.root;
     let form_data = new FormData(form);
@@ -28,23 +36,24 @@ forms.forEach((form) => {
     const data = await res.json();
 
     if (data) {
+      //Restoring disabled button
+      form.querySelector(".submit-add-to-cart").disabled = false;
+      form.querySelector(".submit-add-to-cart").classList.add("bg-blue-800");
+      form.querySelector(".submit-add-to-cart").classList.add("text-white");
+      form.querySelector(".submit-add-to-cart").classList.remove("bg-gray-100");
+      form.querySelector(".submit-add-to-cart").classList.remove("text-black");
+      form.querySelector(".submit-add-to-cart").textContent = "Add to cart";
+
       // rendering heading to update the bubble count
-      const html = document.createElement("div");
-      let new_header = data.sections["sections--19986155733179__header"];
-      html.innerHTML = new_header;
+      const html_header = document.createElement("div");
+      let new_header = data.sections[get_header_section_id];
+      html_header.innerHTML = new_header;
 
       // Updating the bubble
       document.querySelector(".cart-item-bubble > sup").textContent =
-        html.querySelector(".cart-item-bubble > sup").textContent;
+        html_header.querySelector(".cart-item-bubble > sup").textContent;
 
-      // rendering the cart-drawer to update with the new data
-      const cart_drawer_html = document.createElement("section");
-      let new_cart_drawer = data.sections["cart-drawer"];
-
-      cart_drawer_html.innerHTML = new_cart_drawer;
-      document.querySelector("[data-drawer-id]").outerHTML =
-        cart_drawer_html.innerHTML;
-      document.dispatchEvent(new CustomEvent("cart:open"));
+      document.dispatchEvent(new CustomEvent("cart:updated"));
     }
   });
 });

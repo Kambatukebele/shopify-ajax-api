@@ -12,7 +12,7 @@
       {% render 'cart-drawer-header' %}
 
       {% if cart.empty? %}
-        <div class="w-full relative h-screen">
+        <div class="w-full relative h-screen cart-drawer-empty-state">
           <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
             <h3 class="text-center mb-4">Your cart is empty</h3>
             <a href="{{ routes.collections_url }}" class="block px-8 py-3 bg-black text-white rounded-xl"
@@ -31,7 +31,7 @@
   </div>
 </cart-drawer>
 
-<style>
+{% stylesheet %}
   #cart-drawer aside {
     transform: translate3d(100%, 0, 0);
   }
@@ -52,4 +52,4 @@
     pointer-events: auto;
     background: rgb(0 0 0 / 40%);
   }
-</style>
+{% endstylesheet %}
