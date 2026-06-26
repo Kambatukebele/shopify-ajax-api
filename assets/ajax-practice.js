@@ -24,9 +24,6 @@ forms.forEach((form) => {
 
     const res = await fetch(`${URL}cart/add.js`, {
       method: "POST",
-      // headers: {
-      //   "Content-Type": "application/json",
-      // },
       body: form_data,
     });
 
@@ -49,7 +46,7 @@ forms.forEach((form) => {
           bubbles: true,
           detail: {
             data_header: data.sections[get_header_section_id],
-            ["data-cart-drawer"]: data.sections["cart-drawer"],
+            data_cart_drawer: data.sections["cart-drawer"],
           },
         }),
       );

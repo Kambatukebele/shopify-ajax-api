@@ -17,7 +17,8 @@ class CartDrawer extends HTMLElement {
     });
     document.addEventListener("cart:updated", (e) => {
       const new_html = document.createElement("div");
-      let new_cart_drawer = e.detail.dataCartDrawer;
+
+      let new_cart_drawer = e.detail.data_cart_drawer;
 
       new_html.innerHTML = new_cart_drawer;
 
@@ -80,6 +81,12 @@ class CartDrawer extends HTMLElement {
       new_updated_qty = 0;
     }
     if (new_updated_qty < 0) return;
+
+    // Get header section id to handle bubble
+    let get_header_section_id = document
+      .querySelector("[data-header-id]")
+      .getAttribute("data-header-id");
+
     const res = await fetch(window.Shopify.routes.root + "cart/change.js", {
       method: "POST",
       headers: {
@@ -88,7 +95,7 @@ class CartDrawer extends HTMLElement {
       body: JSON.stringify({
         id: item_product_item_key,
         quantity: new_updated_qty,
-        sections: "cart-drawer",
+        sections: `cart-drawer,${get_header_section_id}`,
       }),
     });
     const data = await res.json();
@@ -96,7 +103,8 @@ class CartDrawer extends HTMLElement {
     document.dispatchEvent(
       new CustomEvent("cart:updated", {
         detail: {
-          dataCartDrawer: data.sections["cart-drawer"],
+          data_cart_drawer: data.sections["cart-drawer"],
+          data_header: data.sections[get_header_section_id],
         },
       }),
     );

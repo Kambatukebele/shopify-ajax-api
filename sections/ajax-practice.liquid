@@ -18,7 +18,14 @@
             {% else %}
               <select name="id" class="border border-gray-300 px-1 py-2">
                 {% for variant in product.variants %}
-                  <option value="{{ variant.id }}">{{ variant.title }}</option>
+                  <option
+                    {% if variant.id == product.selected_or_first_available_variant.id %}
+                      selected
+                    {% endif %}
+                    value="{{ variant.id }}"
+                  >
+                    {{ variant.title }}
+                  </option>
                 {% endfor %}
               </select>
             {% endif %}
