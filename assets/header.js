@@ -1,17 +1,17 @@
-const cart_icon_bubble = document.querySelector(".cart-item-bubble");
-const cart_drawer = document.querySelector("#cart-drawer");
+const cartIconBubble = document.querySelector(".cart-item-bubble > sup");
 
 // Open the cart drawer on click
-cart_icon_bubble.addEventListener("click", (e) => {
+cartIconBubble.addEventListener("click", () => {
   document.dispatchEvent(new CustomEvent("cart:open"));
 });
 
 //Update header count
 document.addEventListener("cart:updated", (event) => {
-  const new_header = document.createElement("div");
-  const new_html = event.detail.data_header;
+  const newHeader = document.createElement("div");
+  const newHtml = event.detail.header;
 
-  new_header.innerHTML = new_html;
-  document.querySelector(".cart-item-bubble > sup").textContent =
-    new_header.querySelector(".cart-item-bubble > sup").textContent;
+  newHeader.innerHTML = newHtml;
+  cartIconBubble.textContent = newHeader.querySelector(
+    ".cart-item-bubble > sup",
+  ).textContent;
 });

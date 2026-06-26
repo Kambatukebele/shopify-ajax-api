@@ -1,7 +1,8 @@
 class CartDrawer extends HTMLElement {
   connectedCallback() {
-    // target delegation
-    this.cart_drawer = this;
+    // Get header section id to handle bubble
+    this.headerSectionId =
+      document.querySelector("[data-header-id]").dataset.headerId;
 
     // Open CartDrawer
     this._openCartDrawer();
@@ -12,37 +13,35 @@ class CartDrawer extends HTMLElement {
   }
 
   _openCartDrawer() {
-    document.addEventListener("cart:open", (e) => {
-      this.cart_drawer.querySelector("#cart-drawer").classList.add("is-open");
+    document.addEventListener("cart:open", () => {
+      this.querySelector("#cart-drawer").classList.add("is-open");
     });
     document.addEventListener("cart:updated", (e) => {
-      const new_html = document.createElement("div");
+      const newHtml = document.createElement("div");
 
-      let new_cart_drawer = e.detail.data_cart_drawer;
+      let newCartDrawer = e.detail.cartDrawer;
 
-      new_html.innerHTML = new_cart_drawer;
+      newHtml.innerHTML = newCartDrawer;
 
-      const current_cart_drawer =
-        this.cart_drawer.querySelector("#cart-drawer");
-      const new_drawer = new_html.querySelector("#cart-drawer");
+      const drawer = this.querySelector("#cart-drawer");
 
-      current_cart_drawer.innerHTML = new_drawer.innerHTML;
+      const newDrawer = newHtml.querySelector("#cart-drawer");
 
-      this.cart_drawer.querySelector("#cart-drawer").classList.add("is-open");
+      drawer.innerHTML = newDrawer.innerHTML;
+
+      drawer.classList.add("is-open");
     });
   }
   _closeCartDrawer() {
-    this.cart_drawer.addEventListener("click", (e) => {
+    this.addEventListener("click", (e) => {
       if (e.target.closest("#cart-close") !== null) {
-        this.cart_drawer
-          .querySelector("#cart-drawer")
-          .classList.remove("is-open");
+        this.querySelector("#cart-drawer").classList.remove("is-open");
       }
     });
   }
 
   _handleIncreaseDescreaseBtn() {
-    this.cart_drawer.addEventListener("click", (event) => {
+    this.addEventListener("click", (event) => {
       const plus = event.target.closest("[data-counter='plus']");
       const minus = event.target.closest("[data-counter='minus']");
       const remove = event.target.closest(".btn-to-remove");
@@ -67,47 +66,66 @@ class CartDrawer extends HTMLElement {
   async _changeCountItem(btn) {
     const lineItem = btn.closest("[data-line-key]");
 
-    const item_product_item_key = lineItem.getAttribute("data-line-key");
+    const itemProductItemKey = lineItem.dataset.lineKey;
 
     const qtyElement = lineItem.querySelector(".qty");
 
-    let new_updated_qty;
+    // let currentQty;
+    let currentQty;
 
     if (btn.dataset.counter === "plus") {
-      new_updated_qty = Number(qtyElement.textContent) + 1;
+      currentQty = Number(qtyElement.dataset.qty) + 1;
     } else if (btn.dataset.counter === "minus") {
-      new_updated_qty = Number(qtyElement.textContent) - 1;
+      currentQty = Number(qtyElement.dataset.qty) - 1;
     } else {
-      new_updated_qty = 0;
+      currentQty = 0;
     }
-    if (new_updated_qty < 0) return;
+    if (currentQty < 0) return;
 
-    // Get header section id to handle bubble
-    let get_header_section_id = document
-      .querySelector("[data-header-id]")
-      .getAttribute("data-header-id");
-
-    const res = await fetch(window.Shopify.routes.root + "cart/change.js", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: item_product_item_key,
-        quantity: new_updated_qty,
-        sections: `cart-drawer,${get_header_section_id}`,
-      }),
-    });
-    const data = await res.json();
-
-    document.dispatchEvent(
-      new CustomEvent("cart:updated", {
-        detail: {
-          data_cart_drawer: data.sections["cart-drawer"],
-          data_header: data.sections[get_header_section_id],
+    try {
+      const res = await fetch(window.Shopify.routes.root + "cart/change.js", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      }),
-    );
+        body: JSON.stringify({
+          id: itemProductItemKey,
+          quantity: currentQty,
+          sections: `cart-drawer,${this.headerSectionId}`,
+        }),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.description);
+      }
+      const data = await res.json();
+
+      if (
+        data.sections &&
+        data.sections["cart-drawer"] &&
+        data.sections[this.headerSectionId]
+      ) {
+        document.dispatchEvent(
+          new CustomEvent("cart:updated", {
+            detail: {
+              cartDrawer: data.sections["cart-drawer"],
+              header: data.sections[this.headerSectionId],
+            },
+          }),
+        );
+      }
+    } catch (error) {
+      if (btn.dataset.counter === "plus") {
+        const messageBox = btn
+          .closest(".box-item")
+          .querySelector(".error-message");
+
+        // Display error message to the use
+        messageBox.classList.remove("hidden");
+        messageBox.textContent = error.message;
+      }
+    }
   }
 }
 

@@ -4,52 +4,62 @@ forms.forEach((form) => {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    const submitButton = form.querySelector(".submit-add-to-cart");
+
     // Disable button
-    form.querySelector(".submit-add-to-cart").disabled = true;
-    form.querySelector(".submit-add-to-cart").classList.remove("bg-blue-800");
-    form.querySelector(".submit-add-to-cart").classList.remove("text-white");
-    form.querySelector(".submit-add-to-cart").classList.add("bg-gray-100");
-    form.querySelector(".submit-add-to-cart").classList.add("text-black");
-    form.querySelector(".submit-add-to-cart").textContent = "Adding ...";
+    submitButton.disabled = true;
+    submitButton.classList.remove("bg-blue-800");
+    submitButton.classList.remove("text-white");
+    submitButton.classList.add("bg-gray-100");
+    submitButton.classList.add("text-black");
+    submitButton.textContent = "Adding ...";
 
-    // add to cart
-    let URL = window.Shopify.routes.root;
-    let form_data = new FormData(form);
-    // handle bubble
-    let get_header_section_id = document
-      .querySelector("[data-header-id]")
-      .getAttribute("data-header-id");
+    try {
+      // add to cart
+      const URL = window.Shopify.routes.root;
+      const formData = new FormData(form);
+      // handle bubble
+      const getHeaderSectionId = document
+        .querySelector("[data-header-id]")
+        .getAttribute("data-header-id");
 
-    form_data.append("sections", `${get_header_section_id},cart-drawer`);
+      formData.append("sections", `${getHeaderSectionId},cart-drawer`);
+      const res = await fetch(`${URL}cart/add.js`, {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) {
+        const errorMessage = await res.json();
 
-    const res = await fetch(`${URL}cart/add.js`, {
-      method: "POST",
-      body: form_data,
-    });
+        throw new Error(errorMessage.description);
+      }
+      const data = await res.json();
 
-    if (!res.ok) {
-      throw new Error("Something went wront");
-    }
-    const data = await res.json();
-
-    if (data) {
+      // Verify that sections is not returned as null
+      if (
+        data.sections &&
+        data.sections["cart-drawer"] &&
+        data.sections[getHeaderSectionId]
+      ) {
+        document.dispatchEvent(
+          new CustomEvent("cart:updated", {
+            detail: {
+              header: data.sections[getHeaderSectionId],
+              cartDrawer: data.sections["cart-drawer"],
+            },
+          }),
+        );
+      }
+    } catch (error) {
+      console.error(error.message);
+    } finally {
       //Restoring disabled button
-      form.querySelector(".submit-add-to-cart").disabled = false;
-      form.querySelector(".submit-add-to-cart").classList.add("bg-blue-800");
-      form.querySelector(".submit-add-to-cart").classList.add("text-white");
-      form.querySelector(".submit-add-to-cart").classList.remove("bg-gray-100");
-      form.querySelector(".submit-add-to-cart").classList.remove("text-black");
-      form.querySelector(".submit-add-to-cart").textContent = "Add to cart";
-
-      document.dispatchEvent(
-        new CustomEvent("cart:updated", {
-          bubbles: true,
-          detail: {
-            data_header: data.sections[get_header_section_id],
-            data_cart_drawer: data.sections["cart-drawer"],
-          },
-        }),
-      );
+      submitButton.disabled = false;
+      submitButton.classList.add("bg-blue-800");
+      submitButton.classList.add("text-white");
+      submitButton.classList.remove("bg-gray-100");
+      submitButton.classList.remove("text-black");
+      submitButton.textContent = "Add to cart";
     }
   });
 });

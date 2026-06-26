@@ -42,7 +42,7 @@
                 {{ item.image | image_url: width: 200, height: 200 | image_tag: class: 'w-full h-full object-cover' }}
               </div>
 
-              <div class="flex-1">
+              <div class="flex-1 box-item">
                 <div class="flex justify-between gap-4">
                   <div>
                     <h3 class="font-medium">{{ item.title }}</h3>
@@ -58,12 +58,15 @@
                 <div data-line-key="{{ item.key }}" class="flex items-center justify-between mt-4">
                   <div class="flex items-center border border-neutral-300 rounded-lg">
                     <button data-counter="minus" class="px-3 py-2 cursor-pointer">−</button>
-                    <span class="px-4 py-2 border-x border-neutral-300 qty"> {{ item.quantity }} </span>
+                    <span class="px-4 py-2 border-x border-neutral-300 qty" data-qty="{{ item.quantity }}">
+                      {{ item.quantity }}
+                    </span>
                     <button data-counter="plus" class="px-3 py-2 cursor-pointer">+</button>
                   </div>
 
                   <button class="btn-to-remove cursor-pointer text-sm text-neutral-500 hover:text-black">Remove</button>
                 </div>
+                <div class="error-message text-xs my-2 text-red-900 hidden"></div>
               </div>
             </div>
           {% endfor %}
